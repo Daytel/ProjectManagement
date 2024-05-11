@@ -137,8 +137,8 @@ export class FileService{
                 }
             }),
             catchError(error => {
-                console.error("Ошибка при извлечении объекта", error);
-                return throwError("Ошибка при извлечении объекта");
+                console.error("Ошибка при извлечении объектов", error);
+                return throwError("Ошибка при извлечении объектов");
             })
         )
     }
