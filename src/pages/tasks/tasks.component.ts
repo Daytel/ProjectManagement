@@ -1,26 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Participant } from '../commands/commands.component';
-import { Project } from 'src/app/app.component';
+import { Project } from '../project/project.component';
+import { DataService } from 'src/service/senddata.servive';
+import { Subscription } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 export interface Task{ // Задача
   project: Project;
   name: string; // Имя
   description: string; // Описание
-  status: Status; // Статус выполнения
-  priority: Priority; // Приоритет
+  status: string; // Статус выполнения
+  priority: string; // Приоритет
   executor: Participant; // Исполнитель
-}
-enum Status{
-  done = "done", // готово
-  ad = "almost dont", // почти готово
-  iDev = "in development", // В разработке
-  ns = "not started" // не начато
-}
-enum Priority{
-  urgently = "urgently", // срочно
-  im = "important", // важно
-  nec = "necessary", // необходимо
-  wb = "would be nice" // было бы неплохо
 }
 
 @Component({
@@ -29,5 +20,50 @@ enum Priority{
   styleUrls: ['./tasks.component.css']
 })
 export class TasksComponent {
+  title = "Задачи"
 
+  taskForm: FormGroup;
+  tasks: Task[] = [];
+  projects!: Project[];
+  private Psubscribe: Subscription;
+  participants!: Participant[];
+  private ParSubscribe: Subscription;
+
+  @Input()
+  set t(t: Task[]){this.tasks = t;}
+
+  @Output()
+  tasks$ = new EventEmitter<Task[]>();
+  @Output()
+  page$ = new EventEmitter<string>();
+
+  constructor(
+    private ds: DataService,
+    private fb: FormBuilder,
+  ){
+    this.Psubscribe = this.ds.projects$.subscribe(data => {
+      this.projects = data;
+    })
+    this.ParSubscribe = this.ds.participants$.subscribe(data =>{
+      this.participants = data;
+    })
+    this.taskForm = this.fb.group({
+      name: new FormControl("", {validators: [Validators.required]}),
+      description: [""],
+      project: [null],
+      priority: [""],
+      status: [""],
+      executor: [null]
+    }
+    )
+  }
+
+  ngOnDestroy(){
+    this.Psubscribe.unsubscribe();
+    this.ParSubscribe.unsubscribe();
+  }
+
+  addProject(){
+
+  }
 }

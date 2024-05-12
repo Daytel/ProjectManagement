@@ -1,1 +1,66 @@
-<p>tasks works!</p>
+<ng-content></ng-content>
+<h1>Задачи</h1>
+<form [formGroup]="taskForm" (ngSubmit)="addProject()">
+    <fieldset>
+        <legend>Имя задачи*</legend>
+        <div>
+          <input type="text" name="name" formControlName="name"><br>
+        </div>
+        <div *ngIf="taskForm.controls['name'].invalid && taskForm.controls['name'].touched">
+          <p>Имя указано неверно!</p>
+        </div>
+      </fieldset>
+    <fieldset>
+        <legend>Описание</legend>
+        <div>
+          <textarea name="description" formControlName="description" rows="5" cols="50"></textarea>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Имя проекта*</legend>
+        <div *ngFor="let project of projects">
+            <label>{{project.name}}</label>
+            <input type="radio" name="project" formControlName="project" value={{project.name}}><br>
+        </div>
+    </fieldset>
+    <fieldset [disabled]="participants == undefined">
+        <legend>Приоритет</legend>
+        <div>
+          <label for="urgently">Срочно</label>
+          <input type="radio" id="urgently" name="priority" formControlName="priority" value="urgently"><br>
+          <label for="important">Важно</label>
+          <input type="radio" id="important" name="priority" formControlName="priority" value="important"><br>
+          <label for="necessary">Необходимо</label>
+          <input type="radio" id="necessary" name="priority" formControlName="priority" value="necessary"><br>
+          <label for="would be nice">Было бы неплохо</label>
+          <input type="radio" id="would be nice" name="priority" formControlName="priority" value="would be nice"><br>
+        </div>
+        <div *ngIf="participants == undefined">
+            <p>Поля ПРИОРИТЕТ не доступны, поскольку не задана команда, выполняющая проект</p>
+        </div>
+      </fieldset>
+      <fieldset [disabled]="participants == undefined">
+        <legend>Статус</legend>
+        <div>
+          <label for="done">Готово</label>
+          <input type="radio" id="done" name="status" formControlName="status" value="done"><br>
+          <label for="almost done">Почти готово</label>
+          <input type="radio" id="almost done" name="status" formControlName="status" value="almost done"><br>
+          <label for="in development">В разработке</label>
+          <input type="radio" id="in development" name="status" formControlName="status" value="in development"><br>
+          <label for="not started">Не начато</label>
+          <input type="radio" id="not started" name="status" formControlName="status" value="not started"><br>
+        </div>
+        <div *ngIf="participants == undefined">
+            <p>Поля СТАТУС не доступны, поскольку не задана команда, выполняющая проект</p>
+        </div>
+        </fieldset>
+        <fieldset>
+        <legend>Исполнитель</legend>
+        <div *ngFor="let p of participants">
+            <label>{{p.name}} {{p.surname}} {{p.patronymic}}</label>
+            <input type="radio" name="project" formControlName="project" value={{p}}><br>
+        </div>
+        </fieldset>
+</form>
+<h2>Задачи проектов</h2>

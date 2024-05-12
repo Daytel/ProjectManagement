@@ -1,14 +1,21 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
+import { Participant } from "src/pages/commands/commands.component";
+import { Project } from "src/pages/project/project.component";
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: "any"
 })
 export class DataService{
-    private dataSubject = new Subject<any>(); // Создали объект передачи
-    data$ = this.dataSubject.asObservable(); // Добавили наблюдателя
+    private projectsSubject = new Subject<Project[]>(); // Объект передачи проектов
+    projects$ = this.projectsSubject.asObservable(); // Наблюдатель проектов
+    private participantsSubject = new Subject<Participant[]>(); // Объект передачи работников
+    participants$ = this.participantsSubject.asObservable(); // Наблюдатель работников
 
-    sendData(data: any){
-        this.dataSubject.next(data); // Получаем данные
+    sendProjects(data: Project[]){
+        this.projectsSubject.next(data); // Получаем данные
+    }
+    sendParticipants(data: Participant[]){
+        this.participantsSubject.next(data);
     }
 }

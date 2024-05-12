@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { Project } from 'src/app/app.component';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Project } from '../project/project.component';
 
 export interface Command{
+  id: number;
   name: string;
   participants: Participant[];
   projects: Project[];
@@ -24,5 +25,13 @@ enum Role{
   styleUrls: ['./commands.component.css']
 })
 export class CommandsComponent {
+  commands: Command[] = []
 
+  @Input()
+  set c(c: Command[]){this.commands = c;}
+
+  @Output()
+  commands$ = new EventEmitter<Command[]>()
+  @Output()
+  page$ = new EventEmitter<string>();
 }
