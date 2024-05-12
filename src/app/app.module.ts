@@ -5,13 +5,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TasksComponent } from './pages/tasks/tasks.component';
-import { CommandsComponent } from './pages/commands/commands.component';
-import { Routes } from '@angular/router';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { TasksComponent } from '../pages/tasks/tasks.component';
+import { CommandsComponent } from '../pages/commands/commands.component';
+import { RouterModule, Routes } from '@angular/router';
+import { NotFoundComponent } from '../pages/not-found/not-found.component';
+import { FileService } from 'src/service/handitem.service';
+import { DataService } from 'src/service/senddata.servive';
+import { DatePipe } from '../pipes/date.pipe';
 
 const root: Routes = [
-  {path: '', component: AppComponent},
   {path: 'tasks/:name', component: TasksComponent},
   {path: 'command', component: CommandsComponent},
   {path: '**', component: NotFoundComponent}
@@ -21,15 +23,25 @@ const root: Routes = [
   declarations: [
     AppComponent,
     TasksComponent,
-    CommandsComponent
+    CommandsComponent,
+    DatePipe
   ],
   imports: [
     BrowserModule,
+    RouterModule.forRoot(root),
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    FileService,
+    DataService
+  ],
+  bootstrap: [
+    AppComponent,
+    TasksComponent,
+    CommandsComponent,
+    NotFoundComponent
+  ]
 })
 export class AppModule { }

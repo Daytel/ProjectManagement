@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of, switchAll, switchMap, throwError } from "rxjs";
-import { Command } from "src/app/pages/commands/commands.component";
+import { Observable, catchError, map, switchMap, throwError } from "rxjs";
+import { Command } from "src/pages/commands/commands.component";
 import { Path, Project } from "src/app/app.component";
-import { Task } from "src/app/pages/tasks/tasks.component";
+import { Task } from "src/pages/tasks/tasks.component";
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class FileService{
     constructor(private http: HttpClient) {}
 
@@ -25,7 +27,7 @@ export class FileService{
             }),
             catchError(error => {
                 console.error("Ошибка при удалении объекта", error);
-                return throwError("Ошибка при удалении объекта из файла");
+                return throwError(() => new Error("Ошибка при удалении объекта"));
             })
         );
     }
@@ -46,7 +48,7 @@ export class FileService{
             }),
             catchError(error => {
                 console.error("Ошибка при извлечении объекта", error);
-                return throwError("Ошибка при извлечении объекта");
+                return throwError(() => new Error("Ошибка при извлечении объекта"));
             })
         )
     }
@@ -67,24 +69,7 @@ export class FileService{
             }),
             catchError(error => {
                 console.error("Ошибка при обновлении данных", error);
-                return throwError("Ошибка при обновлении данных");
-            })
-        )
-    }
-
-    getCountOfObjects(filePath: string): Observable<number>{
-        return this.http.get(filePath, {responseType: 'text'}).pipe( // Запрос данных в виде текста
-            map((data: string) => {
-                const jsonData = JSON.parse(data); // Преобразование строки в массив объектов
-                if (Array.isArray(jsonData)){
-                    return jsonData.length;
-                } else {
-                    return 0;
-                }
-            }),
-            catchError(error => {
-                console.error("Ошибка при определении числа объектов", error);
-                return throwError("Ошибка при определении числа объектов");
+                return throwError(() => new Error("Ошибка при обновлении данных"));
             })
         )
     }
@@ -102,23 +87,20 @@ export class FileService{
             }),
             catchError(error => {
                 console.error("Ошибка при определении команды проекта", error);
-                return throwError("Ошибка при определении команды проекта");
+                return throwError(() => new Error("Ошибка при определении команды проекта"));
             })
         )
     }
     getNames(filePath: string): Observable<string[]>{
         return this.http.get(filePath, {responseType: 'text'}).pipe( // Запрос данных в виде текста
             map((data: string) => {
-                const jsonData = JSON.parse(data); // Преобразование строки в массив объектов
-                let names: string[] = [];
-                jsonData.forEach((element: Project|Task|Command) => {
-                    names.push(element.name);
-                });
-                return names;
+                if (data.length == 0) return [];
+                const jsonData: (Project|Task|Command)[] = JSON.parse(data); // Преобразование строки в массив объектов
+                return jsonData.map(element => element.name);
             }),
             catchError(error => {
                 console.error("Ошибка при определении команды проекта", error);
-                return throwError("Ошибка при определении команды проекта");
+                return throwError(() => new Error("Ошибка при определении команды проекта"));
             })
         )
     }
@@ -138,7 +120,7 @@ export class FileService{
             }),
             catchError(error => {
                 console.error("Ошибка при извлечении объектов", error);
-                return throwError("Ошибка при извлечении объектов");
+                return throwError(() => new Error("Ошибка при извлечении объектов"));
             })
         )
     }

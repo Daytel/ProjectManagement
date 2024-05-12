@@ -1,10 +1,11 @@
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { FileService } from 'src/service/handitem.service';
 import { DataService } from 'src/service/senddata.servive';
-import { Command } from './pages/commands/commands.component';
-import { Task } from './pages/tasks/tasks.component';
-import { map, Observable } from 'rxjs';
+import { Command } from '../pages/commands/commands.component';
+import { Task } from '../pages/tasks/tasks.component';
+import { map } from 'rxjs';
+import { CustomValidators } from '../validators/namerepeat.validator';
 
 export interface Project{ // Проект
   number: number; // Порядковый номер
@@ -15,9 +16,9 @@ export interface Project{ // Проект
 }
 
 export enum Path{
-  projects = 'assets/projects.json',
-  tasks = 'assets/projetc_tasks.json',
-  commands = 'assets/commands.json'
+  projects = '../assets/projects.json',
+  tasks = '../assets/project_tasks.json',
+  commands = '../assets/commands.json'
 }
 
 @Component({
@@ -25,22 +26,28 @@ export enum Path{
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'Менеджмент проекта';
-  
+export class AppComponent{
+  title = 'Менеджмент проекта'; 
 
   edit: boolean = false;
   number = signal<number>(1, {equal: (a: number, b: number) => a==b});
+  count = signal<number>(0, {equal: (a: number, b: number) => a==b});
   buf_number: number = 0;
   dataCreation = signal<Date>(new Date(), {equal: (a: Date, b: Date) => a==b});
 
   projectForm: FormGroup;
-
-  constructor(private fb: FormBuilder, private fs: FileService, private ds: DataService){
+  fs: FileService;
+  
+  constructor(
+    private fb: FormBuilder,
+    fs: FileService,
+    private ds: DataService,
+    private cv: CustomValidators){
     this.projectForm = this.fb.group({
-      name: ["", [Validators.required, this.notNameRepeat]],
+      name: new FormControl("", {validators: [Validators.required], asyncValidators: [this.cv.notNameRepeat(Path.projects)]}),
       description: [""]
     });
+    this.fs = fs;
   }
 
   addProject(){
@@ -49,8 +56,10 @@ export class AppComponent {
     item.dateCreation = new Date();
     item.dateChange = item.dateCreation;
     this.fs.writeToFile(item, Path.projects).subscribe(() => {
-      alert("Проект успешно добавлен!");
+      console.log("Проект успешно добавлен!");
     });
+    this.number.set(this.number() + 1);
+    this.count.set(this.count() + 1);
   }
 
   deleteProject(index: number){
@@ -61,9 +70,10 @@ export class AppComponent {
     ).subscribe((project: Project) => {
       this.fs.deleteFromFile(Path.projects, project.name); // Удаляем объект
     });
+    this.count.set(this.count() - 1);
   }
 
-  editProject(index: number, edit: boolean){
+  editProject(index: number){
     if (this.edit == false){
       this.fs.getItemFromId(Path.projects, index).pipe(
         map((item: Project|Task|Command) => {
@@ -103,13 +113,15 @@ export class AppComponent {
     this.ds.sendData(this.fs.getItemFromId(Path.projects, index));
   }
 
-  notNameRepeat(control: FormControl): {[s: string]: boolean} | null {
-    let valObj: {[s: string]: boolean} | null = null;
-    this.fs.getNames(Path.projects).subscribe((names: string[]) => {
-      if (names.length == 0 || names.indexOf(control.value) == -1){
-        valObj = {"name": true};
-      }
+  getProjects(){
+    let p: Project[] = []
+    this.fs.getAllObjects(Path.projects).pipe(
+      map((items: Project[]|Task[]|Command[]) => {
+        return items as Project[];
+      })
+    ).subscribe((projects: Project[]) => {
+      p = projects;
     });
-    return valObj;
+    return p;
   }
 }
