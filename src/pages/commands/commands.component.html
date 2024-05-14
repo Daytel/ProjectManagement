@@ -1,78 +1,90 @@
-<h1>Команда</h1>
+<h1 class="text-center">Команда</h1>
 
-<form [formGroup]="commandForm" (ngSubmit)="addCommand()">
-    <fieldset>
-        <legend>Имя комманды*</legend>
-        <div>
-          <input type="text" name="name" formControlName="name"><br>
+<form class="bg-secondary bg-opacity-25" [formGroup]="commandForm" (ngSubmit)="addCommand()">
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Имя комманды*</legend>
+        <div class="input-group">
+          <input type="text" class="form-control" name="name" formControlName="name"><br>
         </div>
-        <div *ngIf="commandForm.controls['name'].invalid && commandForm.controls['name'].touched">
+        <div class="form-label h3 text-danger" *ngIf="commandForm.controls['name'].invalid && commandForm.controls['name'].touched">
           <p>Имя указано неверно!</p>
         </div>
     </fieldset>
-    <fieldset>
-        <legend>Разработчики</legend>
-        <div formArrayName="participants">
-            <fieldset *ngFor="let p of participants; let i = index" [formGroupName]="i">
-                <label>Имя: </label>
-                <input type="text" name="name" formControlName="name"><br>
-                <div *ngIf="participants[i].get('name')?.invalid && participants[i].get('name')?.touched">
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Разработчики</legend>
+        <div class="input-group" formArrayName="participants">
+            <fieldset class="mb-3 flex-nowrap" *ngFor="let p of participants; let i = index" [formGroupName]="i">
+                <div class="input-group">
+                    <label class="form-label h5">Имя: </label>
+                    <input type="text" class="form-control" name="name" formControlName="name"><br>
+                </div>
+                <div class="form-label h3 text-danger" *ngIf="participants[i].get('name')?.invalid && participants[i].get('name')?.touched">
                     <p>ИМЯ указано неверно!</p>
                 </div>
-                <label>Фамилия: </label>
-                <input type="text" name="surname" formControlName="surname"><br>
-                <div *ngIf="participants[i].get('surname')?.invalid && participants[i]?.get('surname')?.touched">
+                <div class="input-group">
+                    <label class="form-label h5">Фамилия:</label>
+                    <input type="text" class="form-control" name="surname" formControlName="surname"><br>
+                </div>
+                <div class="form-label h3 text-danger" *ngIf="participants[i].get('surname')?.invalid && participants[i]?.get('surname')?.touched">
                     <p>ФАМИЛИЯ указано неверно!</p>
                 </div>
-                <label>Отчество: </label>
-                <input type="text" name="patronymic" formControlName="patronymic"><br>
-                <div *ngIf="participants[i]?.get('patronymic')?.invalid && participants[i]?.get('patronymic')?.touched">
+                <div class="input-group">
+                    <label class="form-label h5">Отчество: </label>
+                    <input type="text" class="form-control" name="patronymic" formControlName="patronymic"><br>
+                </div>
+                <div class="form-label h3 text-danger" *ngIf="participants[i]?.get('patronymic')?.invalid && participants[i]?.get('patronymic')?.touched">
                     <p>ОТЧЕСТВО указано неверно!</p>
                 </div>
-                <label>Роль: </label>
-                <select name="role" formControlName="role">
-                    <option *ngFor="let r of role" [value]="r">
+                <label class="form-label h5">Роль: </label>
+                <select class="form-select" name="role" formControlName="role">
+                    <option class="h5" *ngFor="let r of role" [value]="r">
                       {{r}}
                     </option>
                 </select><br>
-                <div *ngIf="participants[i].get('role')?.invalid && participants[i].get('role')?.touched">
+                <div class="form-label h3 text-danger" *ngIf="participants[i].get('role')?.invalid && participants[i].get('role')?.touched">
                     <p>РОЛЬ указана неверно!</p>
                 </div>
-                <label>Контактная информация (почта): </label>
-                <input type="text" name="contact_inf" formControlName="contact_inf"><br>
-                <div *ngIf="participants[i].get('contact_inf')?.invalid && participants[i].get('contact_inf')?.touched">
+                <div class="input-group">
+                    <label class="form-label h5">Контактная информация (почта): </label>
+                    <input type="text" class="form-control" name="contact_inf" formControlName="contact_inf"><br>
+                </div>
+                <div class="form-label h3 text-danger" *ngIf="participants[i].get('contact_inf')?.invalid && participants[i].get('contact_inf')?.touched">
                     <p>ИНФОРМАЦИЯ указано неверно!</p>
                 </div>
-                <button type="button" (click)="removeParticipant(i)">Удалить разработчика</button>
+                <button type="button" class="btn btn-danger" (click)="removeParticipant(i)">Удалить разработчика</button>
             </fieldset>
         </div>
-        <button type="button" (click)="addParticipant()">Добавить разработчика</button>
+        <button type="button" class="btn btn-success" (click)="addParticipant()">Добавить разработчика</button>
     </fieldset>
-    <button *ngIf="edit == false; else edited" type="submit" [disabled]="commandForm.invalid">Сохранить</button>
-    <ng-template #edited>
-        <button #edited type="button" (click)="editCommand(commandForm.value.index)">Сохранить изменения</button>
-    </ng-template>
-    <button type="button" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
-    <button type="button" (click)="viewTasks()" [disabled]="edit">Перейти к задачам</button>
+    <div class="btn-group">
+        <button class="btn btn-success" *ngIf="edit == false; else edited" type="submit" [disabled]="commandForm.invalid">Сохранить</button>
+        <ng-template #edited>
+            <button class="btn btn-success" #edited type="button" (click)="editCommand(commandForm.value.index)">Сохранить изменения</button>
+        </ng-template>
+        <button type="button" class="btn btn-dark" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
+        <button type="button" class="btn btn-dark" (click)="viewTasks()" [disabled]="edit">Перейти к задачам</button>
+    </div>
 </form>
 
 <div *ngIf="commands.length != 0">
     <h2>Список комманд:</h2>
-    <div *ngFor="let c of commands">
-      <fieldset>
-        <legend>{{c.name}}</legend>
-        <h3>Список разработчиков</h3>
-        <div *ngFor="let par of c.participants">
-            <fieldset>
-                <p>Имя: {{par.name}}</p>
-                <p>Фамилия: {{par.surname}}</p>
-                <p>Отчество: {{par.patronymic}}</p>
-                <p>Роль: {{par.role}}</p>
-                <p>Контактная информация (почта): {{par.contact_inf}}</p>
+    <div class="card" *ngFor="let c of commands">
+      <fieldset class="bg-secondary bg-opacity-25">
+        <legend class="card-title h3">Название: {{c.name}}</legend>
+        <h4>Список разработчиков:</h4>
+        <div class="card border-3" *ngFor="let par of c.participants">
+            <fieldset class="bg-secondary bg-opacity-10">
+                <p class="card-text h5">Имя: {{par.name}}</p>
+                <p class="card-text h5">Фамилия: {{par.surname}}</p>
+                <p class="card-text h5">Отчество: {{par.patronymic}}</p>
+                <p class="card-text h5">Роль: {{par.role}}</p>
+                <p class="card-text h5">Контактная информация (почта): {{par.contact_inf}}</p>
             </fieldset>
         </div>
       </fieldset>
-      <button type="button" (click)="editCommand(c.index)" [disabled]="edit">Изменить</button>
-      <button type="button" (click)="deleteCommand(c.index)" [disabled]="edit">Удалить</button>
+      <div class="btn-group">
+        <button type="button" class="btn btn-info" (click)="editCommand(c.index)" [disabled]="edit">Изменить</button>
+        <button type="button" class="btn btn-danger" (click)="deleteCommand(c.index)" [disabled]="edit">Удалить</button>
+      </div>
     </div>
   </div>

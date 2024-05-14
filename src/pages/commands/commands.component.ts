@@ -9,7 +9,7 @@ export interface Command{
   participants: Participant[];
 }
  export interface Participant{
-  command: Command;
+  command: string;
   name: string;
   surname: string;
   patronymic: string;

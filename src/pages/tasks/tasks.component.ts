@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 
 export interface Task{ // Задача
   index: number; // Индекс
-  project: Project;
+  project: string;
   name: string; // Имя
   description: string; // Описание
   status: string; // Статус выполнения
@@ -51,6 +51,7 @@ export class TasksComponent implements OnInit, OnDestroy{
     this.projects = this.s.getProjects();
     this.tasks = this.s.getTasks();
     this.commands = this.s.getCommands();
+    console.log(this.commands);
   }
 
   ngOnDestroy(): void {
@@ -59,6 +60,7 @@ export class TasksComponent implements OnInit, OnDestroy{
 
   addTask(){
     let item: Task = this.taskForm.getRawValue();
+    console.log(item);
     item.index = this.index();
     this.tasks.push(item);
     this.index.set(this.index() + 1);

@@ -1,97 +1,101 @@
-<h1>Задача</h1>
+<h1 class="text-center">Задача</h1>
 
-<form [formGroup]="taskForm" (ngSubmit)="addTask()">
-    <fieldset>
-        <legend>Имя задачи*</legend>
-        <div>
-          <input type="text" name="name" formControlName="name"><br>
+<form class="bg-secondary bg-opacity-25" [formGroup]="taskForm" (ngSubmit)="addTask()">
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Имя задачи*</legend>
+        <div class="input-group">
+          <input type="text" class="form-control" name="name" formControlName="name"><br>
         </div>
-        <div *ngIf="taskForm.controls['name'].invalid && taskForm.controls['name'].touched">
+        <div class="form-label h3 text-danger" *ngIf="taskForm.controls['name'].invalid && taskForm.controls['name'].touched">
           <p>ИМЯ указано неверно!</p>
         </div>
       </fieldset>
-    <fieldset>
-        <legend>Описание</legend>
-        <div>
-          <textarea name="description" formControlName="description" rows="5" cols="50"></textarea>
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Описание</legend>
+        <div class="input-group">
+          <textarea class="form-control" name="description" formControlName="description" rows="5" cols="50"></textarea>
         </div>
     </fieldset>
-    <fieldset>
-        <legend>К проекту*</legend>
-        <div *ngFor="let project of projects">
-            <label>{{project.name}}</label>
-            <input type="radio" name="project" formControlName="project" value={{project.name}}><br>
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">К проекту*</legend>
+        <div class="input-group" *ngFor="let project of projects">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="project" formControlName="project" value="{{project.name}}">
+            <label class="form-check-label h5">{{project.name}}</label>
+          </div>
         </div>
-        <div *ngIf="taskForm.controls['project'].invalid">
+        <div class="form-label h3 text-danger" *ngIf="taskForm.controls['project'].invalid">
           <p>ПРОЕКТ является обязательным полем для заполнения!</p>
         </div>
-        <div *ngIf="projects.length == 0">
+        <div class="form-label h3 text-danger" *ngIf="projects.length == 0">
           <p>Для заполнения формы ЗАДАЧА, необходимо создать ПРОЕКТ в форме ПРОЕКТ!</p>
         </div>
     </fieldset>
-    <fieldset>
-        <legend>Приоритет*</legend>
-        <select name="priority" formControlName="priority">
-          <option *ngFor="let p of priority" [value]="p">
+    <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Приоритет*</legend>
+        <select class="form-select" name="priority" formControlName="priority">
+          <option class="h5" *ngFor="let p of priority" [value]="p">
             {{p}}
           </option>
         </select>
-        <div *ngIf="taskForm.controls['priority'].invalid">
+        <div class="form-label h3 text-danger" *ngIf="taskForm.controls['priority'].invalid">
           <p>ПРИОРИТЕТ является обязательным полем для заполнения!</p>
         </div>
       </fieldset>
-      <fieldset>
-        <legend>Статус*</legend>
-        <select name="status" formControlName="status">
-          <option *ngFor="let s of status" [value]="s">
+      <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Статус*</legend>
+        <select class="form-select" name="status" formControlName="status">
+          <option class="h5" *ngFor="let s of status" [value]="s">
             {{s}}
           </option>
         </select>
-        <div *ngIf="taskForm.controls['status'].invalid">
+        <div class="form-label h3 text-danger" *ngIf="taskForm.controls['status'].invalid">
           <p>Статус является обязательным полем для заполнения!</p>
         </div>
       </fieldset>
-      <fieldset>
-        <legend>Исполнитель*</legend>
+      <fieldset class="mb-3 flex-nowrap">
+        <legend class="form-label h3">Исполнитель*</legend>
         <div *ngFor="let c of commands">
-          <fieldset>
-            <label>Команда: {{c.name}}</label>
-            <select name="executor" formControlName="executor">
-              <option *ngFor="let par of c.participants" [ngValue]="par">
+          <fieldset class="form-control">
+            <label class="h4">Команда: {{c.name}}</label>
+            <select class="form-select" name="executor" formControlName="executor">
+              <option class="h5" *ngFor="let par of c.participants" [ngValue]="par">
                 {{par.name}} {{par.surname}} {{par.patronymic}}
               </option>
             </select>
           </fieldset>
         </div>
-        <div *ngIf="taskForm.controls['executor'].invalid">
+        <div class="form-label h3 text-danger" *ngIf="taskForm.controls['executor'].invalid">
           <p>ИСПОЛНИТЕЛЬ является обязательным полем для заполнения!</p>
         </div>
-        <div *ngIf="commands.length == 0">
+        <div class="form-label h3 text-danger" *ngIf="commands.length == 0">
           <p>Для заполнения пункта ИСПОЛНИТЕЛЬ, необходимо создать КОМАНДУ в форме КОМАНДА!</p>
         </div>
       </fieldset>
-      <div>
-      <button *ngIf="edit == false; else edited" type="submit" [disabled]="taskForm.invalid">Сохранить</button>
+      <div class="btn-group mb-3 flex-nowrap">
+      <button class="btn btn-success" *ngIf="edit == false; else edited" type="submit" [disabled]="taskForm.invalid">Сохранить</button>
       <ng-template #edited>
-        <button #edited type="button" (click)="editTask(taskForm.value.index)">Сохранить изменения</button>
+        <button class="btn btn-success" #edited type="button" (click)="editTask(taskForm.value.index)">Сохранить изменения</button>
       </ng-template>
-      <button type="button" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
-      <button type="button" (click)="viewCommands()" [disabled]="edit">Перейти к командам</button>
+      <button class="btn btn-dark" type="button" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
+      <button class="btn btn-dark" type="button" (click)="viewCommands()" [disabled]="edit">Перейти к командам</button>
     </div>
 </form>
 
 <div *ngIf="tasks.length != 0">
   <h2>Задачи проектов</h2>
-  <div *ngFor="let task of tasks">
-    <fieldset>
-      <legend>{{task.name}}</legend>
-      <p>Проект: {{task.project.name}}</p>
-      <p>Описание: {{task.description}}</p>
-      <p>Статус: {{task.status}}</p>
-      <p>Приоритет: {{task.priority}}</p>
-      <p>Исполнитель: {{task.executor.name}} {{task.executor.surname}} {{task.executor.patronymic}} команды {{task.executor.command.name}}</p>
-      <button type="button" (click)="editTask(task.index)" [disabled]="edit">Изменить</button>
-      <button type="button" (click)="deleteTask(task.index)" [disabled]="edit">Удалить</button>
+  <div class="card" *ngFor="let task of tasks">
+    <fieldset class="bg-secondary bg-opacity-25">
+      <legend class="card-title h3">Название: {{task.name}}</legend>
+      <p class="card-text h5">Проект: {{task.project}}</p>
+      <p class="card-text h5">Описание: {{task.description}}</p>
+      <p class="card-text h5">Статус: {{task.status}}</p>
+      <p class="card-text h5">Приоритет: {{task.priority}}</p>
+      <p class="card-text h5">Исполнитель: {{task.executor.name}} {{task.executor.surname}} {{task.executor.patronymic}} команды {{task.executor.command}}</p>
+      <div class="btn-group">
+        <button class="btn btn-info" type="button" (click)="editTask(task.index)" [disabled]="edit">Изменить</button>
+        <button class="btn btn-danger" type="button" (click)="deleteTask(task.index)" [disabled]="edit">Удалить</button>
+      </div>
     </fieldset>
   </div>
 </div>
