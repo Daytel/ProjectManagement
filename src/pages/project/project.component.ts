@@ -1,6 +1,6 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Storage } from 'src/storage';
+import { Storage } from 'src/storage.service';
 import { Router } from '@angular/router';
 
 export interface Project{ // Проект
