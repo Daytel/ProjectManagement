@@ -83,7 +83,7 @@
 </form>
 
 <div *ngIf="tasks.length != 0">
-  <h2>Задачи проектов</h2>
+  <h2 class="text-center">Задачи проектов</h2>
   <div class="card" *ngFor="let task of tasks">
     <fieldset class="bg-secondary bg-opacity-25">
       <legend class="card-title h3">Название: {{task.name}}</legend>

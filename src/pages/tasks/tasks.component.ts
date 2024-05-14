@@ -51,7 +51,6 @@ export class TasksComponent implements OnInit, OnDestroy{
     this.projects = this.s.getProjects();
     this.tasks = this.s.getTasks();
     this.commands = this.s.getCommands();
-    console.log(this.commands);
   }
 
   ngOnDestroy(): void {

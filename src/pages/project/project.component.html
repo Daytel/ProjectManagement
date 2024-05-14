@@ -27,7 +27,7 @@
 </form>
 
 <div *ngIf="projects.length != 0">
-  <h2>Список проектов:</h2>
+  <h2 class="text-center">Список проектов:</h2>
   <div class="card" *ngFor="let project of projects">
     <fieldset class="bg-secondary bg-opacity-25">
       <legend class="card-title h3">Название: {{project.name}}</legend>
