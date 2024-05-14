@@ -59,7 +59,6 @@ export class TasksComponent implements OnInit, OnDestroy{
 
   addTask(){
     let item: Task = this.taskForm.getRawValue();
-    console.log(item);
     item.index = this.index();
     this.tasks.push(item);
     this.index.set(this.index() + 1);
