@@ -1,13 +1,13 @@
-<ng-content></ng-content>
-<h1>Задачи</h1>
-<form [formGroup]="taskForm" (ngSubmit)="addProject()">
+<h1>Задача</h1>
+
+<form [formGroup]="taskForm" (ngSubmit)="addTask()">
     <fieldset>
         <legend>Имя задачи*</legend>
         <div>
           <input type="text" name="name" formControlName="name"><br>
         </div>
         <div *ngIf="taskForm.controls['name'].invalid && taskForm.controls['name'].touched">
-          <p>Имя указано неверно!</p>
+          <p>ИМЯ указано неверно!</p>
         </div>
       </fieldset>
     <fieldset>
@@ -17,50 +17,82 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>Имя проекта*</legend>
+        <legend>К проекту*</legend>
         <div *ngFor="let project of projects">
             <label>{{project.name}}</label>
             <input type="radio" name="project" formControlName="project" value={{project.name}}><br>
         </div>
-    </fieldset>
-    <fieldset [disabled]="participants == undefined">
-        <legend>Приоритет</legend>
-        <div>
-          <label for="urgently">Срочно</label>
-          <input type="radio" id="urgently" name="priority" formControlName="priority" value="urgently"><br>
-          <label for="important">Важно</label>
-          <input type="radio" id="important" name="priority" formControlName="priority" value="important"><br>
-          <label for="necessary">Необходимо</label>
-          <input type="radio" id="necessary" name="priority" formControlName="priority" value="necessary"><br>
-          <label for="would be nice">Было бы неплохо</label>
-          <input type="radio" id="would be nice" name="priority" formControlName="priority" value="would be nice"><br>
+        <div *ngIf="taskForm.controls['project'].invalid">
+          <p>ПРОЕКТ является обязательным полем для заполнения!</p>
         </div>
-        <div *ngIf="participants == undefined">
-            <p>Поля ПРИОРИТЕТ не доступны, поскольку не задана команда, выполняющая проект</p>
+        <div *ngIf="projects.length == 0">
+          <p>Для заполнения формы ЗАДАЧА, необходимо создать ПРОЕКТ в форме ПРОЕКТ!</p>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Приоритет*</legend>
+        <select name="priority" formControlName="priority">
+          <option *ngFor="let p of priority" [value]="p">
+            {{p}}
+          </option>
+        </select>
+        <div *ngIf="taskForm.controls['priority'].invalid">
+          <p>ПРИОРИТЕТ является обязательным полем для заполнения!</p>
         </div>
       </fieldset>
-      <fieldset [disabled]="participants == undefined">
-        <legend>Статус</legend>
-        <div>
-          <label for="done">Готово</label>
-          <input type="radio" id="done" name="status" formControlName="status" value="done"><br>
-          <label for="almost done">Почти готово</label>
-          <input type="radio" id="almost done" name="status" formControlName="status" value="almost done"><br>
-          <label for="in development">В разработке</label>
-          <input type="radio" id="in development" name="status" formControlName="status" value="in development"><br>
-          <label for="not started">Не начато</label>
-          <input type="radio" id="not started" name="status" formControlName="status" value="not started"><br>
+      <fieldset>
+        <legend>Статус*</legend>
+        <select name="status" formControlName="status">
+          <option *ngFor="let s of status" [value]="s">
+            {{s}}
+          </option>
+        </select>
+        <div *ngIf="taskForm.controls['status'].invalid">
+          <p>Статус является обязательным полем для заполнения!</p>
         </div>
-        <div *ngIf="participants == undefined">
-            <p>Поля СТАТУС не доступны, поскольку не задана команда, выполняющая проект</p>
+      </fieldset>
+      <fieldset>
+        <legend>Исполнитель*</legend>
+        <div *ngFor="let c of commands">
+          <fieldset>
+            <label>Команда: {{c.name}}</label>
+            <select name="executor" formControlName="executor">
+              <option *ngFor="let par of c.participants" [ngValue]="par">
+                {{par.name}} {{par.surname}} {{par.patronymic}}
+              </option>
+            </select>
+          </fieldset>
         </div>
-        </fieldset>
-        <fieldset>
-        <legend>Исполнитель</legend>
-        <div *ngFor="let p of participants">
-            <label>{{p.name}} {{p.surname}} {{p.patronymic}}</label>
-            <input type="radio" name="project" formControlName="project" value={{p}}><br>
+        <div *ngIf="taskForm.controls['executor'].invalid">
+          <p>ИСПОЛНИТЕЛЬ является обязательным полем для заполнения!</p>
         </div>
-        </fieldset>
+        <div *ngIf="commands.length == 0">
+          <p>Для заполнения пункта ИСПОЛНИТЕЛЬ, необходимо создать КОМАНДУ в форме КОМАНДА!</p>
+        </div>
+      </fieldset>
+      <div>
+      <button *ngIf="edit == false; else edited" type="submit" [disabled]="taskForm.invalid">Сохранить</button>
+      <ng-template #edited>
+        <button #edited type="button" (click)="editTask(taskForm.value.index)">Сохранить изменения</button>
+      </ng-template>
+      <button type="button" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
+      <button type="button" (click)="viewCommands()" [disabled]="edit">Перейти к командам</button>
+    </div>
 </form>
-<h2>Задачи проектов</h2>
+
+<div *ngIf="tasks.length != 0">
+  <h2>Задачи проектов</h2>
+  <div *ngFor="let task of tasks">
+    <fieldset>
+      <legend>{{task.name}}</legend>
+      <p>Проект: {{task.project.name}}</p>
+      <p>Описание: {{task.description}}</p>
+      <p>Статус: {{task.status}}</p>
+      <p>Приоритет: {{task.priority}}</p>
+      <p>Исполнитель: {{task.executor.name}} {{task.executor.surname}} {{task.executor.patronymic}} команды {{task.executor.command.name}}</p>
+      <button type="button" (click)="editTask(task.index)" [disabled]="edit">Изменить</button>
+      <button type="button" (click)="deleteTask(task.index)" [disabled]="edit">Удалить</button>
+    </fieldset>
+  </div>
+</div>
+

@@ -1,2 +1,78 @@
-<ng-content></ng-content>
-<p>commands works!</p>
+<h1>Команда</h1>
+
+<form [formGroup]="commandForm" (ngSubmit)="addCommand()">
+    <fieldset>
+        <legend>Имя комманды*</legend>
+        <div>
+          <input type="text" name="name" formControlName="name"><br>
+        </div>
+        <div *ngIf="commandForm.controls['name'].invalid && commandForm.controls['name'].touched">
+          <p>Имя указано неверно!</p>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Разработчики</legend>
+        <div formArrayName="participants">
+            <fieldset *ngFor="let p of participants; let i = index" [formGroupName]="i">
+                <label>Имя: </label>
+                <input type="text" name="name" formControlName="name"><br>
+                <div *ngIf="participants[i].get('name')?.invalid && participants[i].get('name')?.touched">
+                    <p>ИМЯ указано неверно!</p>
+                </div>
+                <label>Фамилия: </label>
+                <input type="text" name="surname" formControlName="surname"><br>
+                <div *ngIf="participants[i].get('surname')?.invalid && participants[i]?.get('surname')?.touched">
+                    <p>ФАМИЛИЯ указано неверно!</p>
+                </div>
+                <label>Отчество: </label>
+                <input type="text" name="patronymic" formControlName="patronymic"><br>
+                <div *ngIf="participants[i]?.get('patronymic')?.invalid && participants[i]?.get('patronymic')?.touched">
+                    <p>ОТЧЕСТВО указано неверно!</p>
+                </div>
+                <label>Роль: </label>
+                <select name="role" formControlName="role">
+                    <option *ngFor="let r of role" [value]="r">
+                      {{r}}
+                    </option>
+                </select><br>
+                <div *ngIf="participants[i].get('role')?.invalid && participants[i].get('role')?.touched">
+                    <p>РОЛЬ указана неверно!</p>
+                </div>
+                <label>Контактная информация (почта): </label>
+                <input type="text" name="contact_inf" formControlName="contact_inf"><br>
+                <div *ngIf="participants[i].get('contact_inf')?.invalid && participants[i].get('contact_inf')?.touched">
+                    <p>ИНФОРМАЦИЯ указано неверно!</p>
+                </div>
+                <button type="button" (click)="removeParticipant(i)">Удалить разработчика</button>
+            </fieldset>
+        </div>
+        <button type="button" (click)="addParticipant()">Добавить разработчика</button>
+    </fieldset>
+    <button *ngIf="edit == false; else edited" type="submit" [disabled]="commandForm.invalid">Сохранить</button>
+    <ng-template #edited>
+        <button #edited type="button" (click)="editCommand(commandForm.value.index)">Сохранить изменения</button>
+    </ng-template>
+    <button type="button" (click)="viewProjects()" [disabled]="edit">Перейти к проектам</button>
+    <button type="button" (click)="viewTasks()" [disabled]="edit">Перейти к задачам</button>
+</form>
+
+<div *ngIf="commands.length != 0">
+    <h2>Список комманд:</h2>
+    <div *ngFor="let c of commands">
+      <fieldset>
+        <legend>{{c.name}}</legend>
+        <h3>Список разработчиков</h3>
+        <div *ngFor="let par of c.participants">
+            <fieldset>
+                <p>Имя: {{par.name}}</p>
+                <p>Фамилия: {{par.surname}}</p>
+                <p>Отчество: {{par.patronymic}}</p>
+                <p>Роль: {{par.role}}</p>
+                <p>Контактная информация (почта): {{par.contact_inf}}</p>
+            </fieldset>
+        </div>
+      </fieldset>
+      <button type="button" (click)="editCommand(c.index)" [disabled]="edit">Изменить</button>
+      <button type="button" (click)="deleteCommand(c.index)" [disabled]="edit">Удалить</button>
+    </div>
+  </div>

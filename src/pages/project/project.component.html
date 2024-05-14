@@ -1,4 +1,4 @@
-<h1>Менеджмент проекта</h1>
+<h1>Проект</h1>
 
 <form [formGroup]="projectForm" (ngSubmit)="addProject()">
   <fieldset>
@@ -7,10 +7,7 @@
       <input type="text" name="name" formControlName="name"><br>
     </div>
     <div *ngIf="projectForm.controls['name'].invalid && projectForm.controls['name'].touched">
-      <p>Имя указано неверно!</p>
-    </div>
-    <div *ngIf="projectForm.get('name')?.hasError('nameTaken') && edit == false">
-      <p>Такое имя проекта уже существует!</p>
+      <p>ИМЯ указано неверно!</p>
     </div>
   </fieldset>
   <fieldset>
@@ -19,15 +16,17 @@
       <textarea name="description" formControlName="description" rows="5" cols="50"></textarea>
     </div>
   </fieldset>
-  <div *ngIf="edit == false; else edited">
-    <button type="submit" [disabled]="projectForm.invalid">Сохранить</button>
+  <div>
+      <button *ngIf="edit == false; else edited" type="submit" [disabled]="projectForm.invalid">Сохранить</button>
+    <ng-template #edited>
+      <button #edited type="button" (click)="editProject(projectForm.value.index)">Сохранить изменения</button>
+    </ng-template>
+    <button type="button" (click)="viewTasks()" [disabled]="edit">Перейти к задачам проекта</button>
+    <button type="button" (click)="viewCommand()" [disabled]="edit">Перейти к командам</button>
   </div>
-  <ng-template #edited>
-    <button type="button" (click)="editProject(projectForm.value.id)">Сохранить изменения</button>
-  </ng-template>
 </form>
 
-<div *ngIf="index() != 0">
+<div *ngIf="projects.length != 0">
   <h2>Список проектов:</h2>
   <div *ngFor="let project of projects">
     <fieldset>
@@ -37,9 +36,6 @@
       <p>Дата изменения: {{project.dateChange | today}}</p>
       <button type="button" (click)="editProject(project.index)" [disabled]="edit">Изменить</button>
       <button type="button" (click)="deleteProject(project.index)" [disabled]="edit">Удалить</button>
-      <button type="button" (click)="viewTasks(project.index)" [disabled]="edit">Перейти к задачам проекта</button>
-      <button type="button" (click)="viewCommand()" [disabled]="edit">Перейти к командам</button>
     </fieldset>
   </div>
 </div>
-<ng-content></ng-content>

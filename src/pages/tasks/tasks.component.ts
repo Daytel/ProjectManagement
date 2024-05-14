@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Participant } from '../commands/commands.component';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Command, Participant } from '../commands/commands.component';
 import { Project } from '../project/project.component';
-import { DataService } from 'src/service/senddata.servive';
-import { Subscription } from 'rxjs';
+import { Storage } from 'src/storage';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 export interface Task{ // Задача
+  index: number; // Индекс
   project: Project;
   name: string; // Имя
   description: string; // Описание
@@ -19,51 +20,86 @@ export interface Task{ // Задача
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css']
 })
-export class TasksComponent {
+export class TasksComponent implements OnInit, OnDestroy{
   title = "Задачи"
 
   taskForm: FormGroup;
   tasks: Task[] = [];
-  projects!: Project[];
-  private Psubscribe: Subscription;
-  participants!: Participant[];
-  private ParSubscribe: Subscription;
-
-  @Input()
-  set t(t: Task[]){this.tasks = t;}
-
-  @Output()
-  tasks$ = new EventEmitter<Task[]>();
-  @Output()
-  page$ = new EventEmitter<string>();
+  projects: Project[] = [];
+  commands: Command[] = [];
+  edit: boolean = false;
+  index = signal<number>(0, {equal:(a: number, b: number) => a==b});
+  priority: string[] = ["Срочно","Важно","Необходимо","Было бы неплохо"];
+  status: string[] = ["Готово", "Почти готово", "В разработке", "Не начато"];
 
   constructor(
-    private ds: DataService,
+    private s: Storage,
     private fb: FormBuilder,
+    private root: Router
   ){
-    this.Psubscribe = this.ds.projects$.subscribe(data => {
-      this.projects = data;
-    })
-    this.ParSubscribe = this.ds.participants$.subscribe(data =>{
-      this.participants = data;
-    })
     this.taskForm = this.fb.group({
-      name: new FormControl("", {validators: [Validators.required]}),
-      description: [""],
-      project: [null],
-      priority: [""],
-      status: [""],
-      executor: [null]
+      "name": new FormControl("", {validators: [Validators.required]}),
+      "description": [""],
+      "project": new FormControl (null, {validators: [Validators.required]}),
+      "priority": new FormControl ("", {validators: [Validators.required]}),
+      "status": new FormControl("", {validators: [Validators.required]}),
+      "executor": new FormControl (null, {validators: [Validators.required]})
+    })
+  }
+
+  ngOnInit(): void {
+    this.projects = this.s.getProjects();
+    this.tasks = this.s.getTasks();
+    this.commands = this.s.getCommands();
+  }
+
+  ngOnDestroy(): void {
+    this.s.setTasks(this.tasks);
+  }
+
+  addTask(){
+    let item: Task = this.taskForm.getRawValue();
+    item.index = this.index();
+    this.tasks.push(item);
+    this.index.set(this.index() + 1);
+    this.taskForm.reset();
+  }
+
+  deleteTask(index: number){
+    this.tasks.splice(index, 1);
+    this.tasks.forEach((task: Task, i: number) => {
+      task.index = i;
+    })
+    this.index.set(this.index() - 1);
+  }
+
+  editTask(index: number){
+    if (!this.edit){
+      this.taskForm.patchValue(this.tasks[index]);
+      this.edit = !this.edit;
+      this.index.set(index);
+      window.scrollTo({top: 0});
     }
-    )
+    else{
+      this.edit = !this.edit;
+      let item: Task = this.taskForm.getRawValue();
+      item.index = this.index();
+      this.tasks[item.index] = item;
+      this.index.set(this.tasks.length);
+      this.taskForm.reset();
+    }
   }
 
-  ngOnDestroy(){
-    this.Psubscribe.unsubscribe();
-    this.ParSubscribe.unsubscribe();
+  patchParticipant(index: number, number: number, data: Participant){
+    const participant = this.taskForm.value.participant;
+    participant?.patchValue(data);
   }
 
-  addProject(){
+  viewProjects(){
+    this.root.navigate(["/"]);
+  }
 
+  viewCommands(){
+    this.root.navigate(['/commands']);
   }
 }

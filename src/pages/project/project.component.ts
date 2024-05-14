@@ -1,6 +1,7 @@
-import { Component, signal, Input, Output, EventEmitter } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { DataService } from 'src/service/senddata.servive';
+import { Storage } from 'src/storage';
+import { Router } from '@angular/router';
 
 export interface Project{ // Проект
   index: number;
@@ -15,7 +16,7 @@ export interface Project{ // Проект
   templateUrl: './project.component.html',
   styleUrls: ['./project.component.css']
 })
-export class ProjectComponent{
+export class ProjectComponent implements OnInit, OnDestroy{
   title = 'Менеджмент проекта';
 
   edit: boolean = false;
@@ -24,22 +25,23 @@ export class ProjectComponent{
 
   projectForm: FormGroup;
   projects: Project[] = [];
-
-  @Input()
-  set p(p: Project[]){ this.projects = p;}
-
-  @Output()
-  projects$ = new EventEmitter<Project[]>();
-  @Output()
-  page$ = new EventEmitter<string>();
   
   constructor(
     private fb: FormBuilder,
-    private ds: DataService){
+    private s: Storage,
+    private root: Router){
     this.projectForm = this.fb.group({
-      name: new FormControl("", {validators: [Validators.required]}),
-      description: [""]
+      "name": new FormControl("", [Validators.required]),
+      "description": [""]
     });
+  }
+
+  ngOnInit(): void {
+    this.projects = this.s.getProjects();
+  }
+
+  ngOnDestroy(): void {
+    this.s.setProjects(this.projects);
   }
 
   addProject(){
@@ -56,8 +58,8 @@ export class ProjectComponent{
     this.projects.splice(index, 1);
     this.projects.forEach((proj: Project, i: number) =>{
       proj.index = i;
-      this.index.set(this.index() - 1);
-    })  
+    })
+    this.index.set(this.index() - 1);
   }
 
   editProject(index: number){
@@ -80,14 +82,11 @@ export class ProjectComponent{
     }
   }
 
-  viewTasks(index: number){
-    this.projects$.emit(this.projects);
-    this.ds.sendProjects(this.projects);
-    this.page$.emit('task');
+  viewTasks(){
+    this.root.navigate(['/tasks']);
   }
 
   viewCommand(){
-    this.projects$.emit(this.projects);
-    this.page$.emit('command');
+    this.root.navigate(['/commands']);
   }
 }
